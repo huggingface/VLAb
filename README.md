@@ -26,38 +26,24 @@ A streamlined library for pretraining VLA models, derived from LeRobot, used to 
 - [Additional Resources](#additional-resources)
 
 > Note on video backends
->
+
 > By default we avoid pinning system FFmpeg in the environment to prevent compatibility issues with TorchCodec on some systems. The training pipeline works with alternative video backends (PyAV, OpenCV, ImageIO). If you specifically need TorchCodec, install FFmpeg in your environment and ensure the FFmpeg libraries match TorchCodec's compatibility table. Otherwise, set `--dataset.video_backend=pyav` (default) or switch to OpenCV/ImageIO in your data loader.
 
 ## Features
 
-It is directly compatible with the https://huggingface.co/datasets/HuggingFaceVLA/community_dataset_v1 and https://huggingface.co/datasets/HuggingFaceVLA/community_dataset_v2 that are used to pretrain smolvla. Note that, while this library can be efficient for pretraining, for finetuning we recommend using lerobot as it is more up-to-date with the inference pipeline and new hardware being added to lerobot. 
+It is directly compatible with the https://huggingface.co/datasets/HuggingFaceVLA/community_dataset_v1 and https://huggingface.co/datasets/HuggingFaceVLA/community_dataset_v2 that are used to pretrain smolvla. Note that, while this library can be efficient for pretraining, for finetuning we recommend using lerobot as it is more up-to-date with the inference pipeline and new hardware. 
 
+## Who is this Library for?
 
-- **Pretraining-Focused**: Streamlined codebase for VLA pretraining workflows—environment simulation and evaluation dependencies removed for cleaner pretraining on real-world data pipelines
-- **Simple Setup**: Single-command environment creation with `conda env create -f environment.yml`
-- **Distributed Training**: Multi-GPU and multi-node support via Accelerate, tested on single machines and SLURM clusters
-- **Multi-Dataset Training**: Train on multiple datasets with configurable sampling strategies and automatic data loading
-- **Reduced Dependencies**: Smaller footprint than full robotics frameworks—faster installation and fewer potential conflicts
-
-## Prerequisites
-
-Before installing, ensure you have:
-
-- **Python 3.10 or higher** (3.10+ recommended)
-- **CUDA-capable GPU(s)** for training (recommended: CUDA 11.8 or 12.1+)
-- **Conda** (for Option 1) or **pip** (for Option 2)
-- **Git** (to clone the repository)
-
-For detailed LeRobot installation instructions, see: [LeRobot Installation Guide](https://huggingface.co/docs/lerobot/en/installation)
+**Pretraining-Focused**: Streamlined codebase designed specifically for VLA pretraining workflows—environment simulation and evaluation dependencies removed to enable cleaner pretraining on real-world data pipelines
+**Simple Setup**: Get started immediately with single-command environment creation using conda env create -f environment.yml
+**Distributed Training**: Seamless multi-GPU and multi-node support through Accelerate, tested on both single machines and SLURM clusters
+**Multi-Dataset Training:** Easily train on multiple datasets with configurable sampling strategies and automatic data loading
+**Reduced Dependencies:** Leaner footprint compared to full robotics frameworks in a favor of faster installation and fewer potential conflicts.
 
 ## Installation
 
-### Option 1: Conda Environment (Recommended)
-
-The easiest way to set up the environment is using a conda environment similar to the lerobot environment.
-
-#### Step 1: Check Your CUDA Version (Important!)
+#### Step 1: Check Your CUDA Version 
 
 Before creating the environment, check your CUDA version:
 
