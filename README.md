@@ -43,58 +43,35 @@ It is directly compatible with the https://huggingface.co/datasets/HuggingFaceVL
 
 ## Installation
 
-#### Step 1: Check Your CUDA Version 
-
-Before creating the environment, check your CUDA version:
+Create the conda environment from `environment.yml`:
 
 ```bash
-# Check CUDA version
-nvcc --version  # or nvidia-smi
-
-# Note: Adjust PyTorch installation based on your CUDA version
-```
-
-#### Step 2: Create the Conda Environment from environment.yml
-
-```bash
-# Navigate to the project directory
-cd /path/to/VLAb
-
-# Create the environment from the provided file
 conda env create -f environment.yml
 conda activate vlab
-
-# If your system uses CUDA 12.1, edit environment.yml and set:
-#   pytorch-cuda=12.1
 ```
 
-#### Step 3: Set Up Python Path
+**Note:** If your system uses CUDA 12.1, edit `environment.yml` and set `pytorch-cuda=12.1` before creating the environment.
 
-```bash
-# Set the PYTHONPATH to include the source directory
-export PYTHONPATH="/path/to/VLAb/src:$PYTHONPATH"
-
-# Add this to your ~/.bashrc or ~/.zshrc for persistence:
-echo 'export PYTHONPATH="/path/to/VLAb/src:$PYTHONPATH"' >> ~/.bashrc
-```
-
-## Setup
+Ensure your Python path includes the `src` directory (e.g., set `PYTHONPATH` to include `src`).
 
 ### Verify Installation
 
-Test that everything is set up correctly:
+Run the test script to verify everything is set up correctly:
 
 ```bash
-# Activate your environment
-conda activate vlab # or source venv/bin/activate for venv
+python test_installation.py
+```
 
-# Verify Python path
-python -c "import sys; print('\n'.join(sys.path))" | grep VLAb || python -c "import sys; print('\n'.join(sys.path))"
-
-# Test imports
-python -c "from lerobot.configs.train import TrainPipelineConfig; print('✓ Configuration loaded')"
-python -c "from lerobot.policies.factory import make_policy; print('✓ Policy factory loaded')"
-python -c "from lerobot.datasets.factory import make_dataset; print('✓ Dataset factory loaded')"
+This will output:
+```
+============================================================
+VLAb Installation Test
+============================================================
+✓ TrainPipelineConfig
+✓ Policy factory
+✓ Dataset factory
+============================================================
+✅ All tests passed!
 ```
 
 ### Configure HuggingFace Hub (if using remote datasets)
