@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+from pathlib import Path
 from pprint import pformat
 
 import torch
@@ -92,15 +93,19 @@ def make_dataset(cfg: TrainPipelineConfig) -> LeRobotDataset | MultiLeRobotDatas
     feature_keys_mapping = FEATURE_KEYS_MAPPING
     if isinstance(repo_id, str):
         revision = getattr(cfg.dataset, "revision", None)
+        root = getattr(cfg.dataset, "root", None)
+        # If root is provided, construct the full path as root/repo_id
+        dataset_root = Path(root) / cfg.dataset.repo_id if root else None
         ds_meta = LeRobotDatasetMetadata(
             cfg.dataset.repo_id,
+            root=dataset_root,
             feature_keys_mapping=feature_keys_mapping,
             revision=revision,
         )
         delta_timestamps = resolve_delta_timestamps(cfg.policy, ds_meta)
         dataset = LeRobotDataset(
             cfg.dataset.repo_id,
-            root=getattr(cfg.dataset, "root", None),
+            root=dataset_root,
             episodes=cfg.dataset.episodes,
             delta_timestamps=delta_timestamps,
             image_transforms=image_transforms,
@@ -116,10 +121,16 @@ def make_dataset(cfg: TrainPipelineConfig) -> LeRobotDataset | MultiLeRobotDatas
     else:
         delta_timestamps = {}
         episodes = {}
+        root = getattr(cfg.dataset, "root", None)
+        revision = getattr(cfg.dataset, "revision", None)
         for i in range(len(repo_id)):
+            # For multi-dataset with root, construct the full path as root/repo_id[i]
+            dataset_root = Path(root) / repo_id[i] if root else None
             ds_meta = LeRobotDatasetMetadata(
                 repo_id[i],
+                root=dataset_root,
                 feature_keys_mapping=feature_keys_mapping,
+                revision=revision,
             )  # FIXME(mshukor): ?
             delta_timestamps[repo_id[i]] = resolve_delta_timestamps(cfg.policy, ds_meta)
             episodes[repo_id[i]] = EPISODES_DATASET_MAPPING.get(repo_id[i], cfg.dataset.episodes)
@@ -128,6 +139,7 @@ def make_dataset(cfg: TrainPipelineConfig) -> LeRobotDataset | MultiLeRobotDatas
         training_features = None
         dataset = MultiLeRobotDataset(
             repo_id,
+            root=root,
             # TODO(aliberts): add proper support for multi dataset
             episodes=episodes,
             delta_timestamps=delta_timestamps,

@@ -576,7 +576,6 @@ class LeRobotDataset(torch.utils.data.Dataset):
 
         # mustafa code
         if self.discard_first_n_frames > 0:
-            print("Discarding first n frames:", self.discard_first_n_frames)
             self.subset_frame_ids = []
             for ep_idx in range(self.num_episodes):
                 from_ = self.episode_data_index["from"][ep_idx]
@@ -586,9 +585,6 @@ class LeRobotDataset(torch.utils.data.Dataset):
                     frame_idx for frame_idx in range(from_ + int(self.fps * self.discard_first_n_frames), to_)
                 ]
         elif self.discard_first_idle_frames:
-            print(
-                f"Discarding first idle frames: motion_threshold={self.motion_threshold}, motion_window_size={self.motion_window_size}, motion_buffer={self.motion_buffer}"
-            )
             self.robot_states = torch.stack(self.hf_dataset[OBS_STATE]).numpy()  # shape: [T, D]
             self.subset_frame_ids = []
             for ep_idx in range(self.num_episodes):
@@ -639,7 +635,6 @@ class LeRobotDataset(torch.utils.data.Dataset):
         )
         self.robot_type = self.meta.info.get("robot_type", "")
         # Override tasks
-        print(TASKS_KEYS_MAPPING.get(self.repo_id, self.meta.tasks), "previous", self.meta.tasks)
         self.meta.tasks = TASKS_KEYS_MAPPING.get(self.repo_id, self.meta.tasks)
 
     def push_to_hub(
@@ -828,17 +823,28 @@ class LeRobotDataset(torch.utils.data.Dataset):
     # TODO: changed by mustafa
     def _query_hf_dataset(self, query_indices: dict[str, list[int]]) -> dict:
         queries = {}
+        hf_columns = set(self.hf_dataset.column_names)
+        
         for key, q_idx in query_indices.items():
-            if (
-                key not in self.meta.video_keys
-                and self.inverse_feature_keys_mapping.get(key, key) not in self.meta.video_keys
-            ):
-                key_ = (
-                    self.inverse_feature_keys_mapping.get(key, key)
-                    if self.inverse_feature_keys_mapping
-                    else key
-                )
-                queries[key] = torch.stack(self.hf_dataset.select(q_idx)[key_])
+            # Map original key to standardized key to check against video_keys
+            # video_keys contains standardized keys (e.g., "observation.images.image2")
+            # query_indices contains original keys (e.g., "observation.images.side")
+            standardized_key = self.feature_keys_mapping.get(key, key) if self.feature_keys_mapping else key
+            
+            # Check if this key (or its standardized version) is a video key
+            is_video_key = (
+                key in self.meta.video_keys
+                or standardized_key in self.meta.video_keys
+            )
+            
+            # Fallback: if key starts with "observation.images." and is not in HF dataset columns,
+            # it's likely a video key (images stored as videos, not in parquet)
+            if not is_video_key and key.startswith("observation.images.") and key not in hf_columns:
+                is_video_key = True
+            
+            if not is_video_key:
+                # Use the original key to query from HF dataset (parquet files use original keys)
+                queries[key] = torch.stack(self.hf_dataset.select(q_idx)[key])
         return queries
 
     def _query_videos(self, query_timestamps: dict[str, list[float]], ep_idx: int) -> dict[str, torch.Tensor]:
@@ -890,7 +896,7 @@ class LeRobotDataset(torch.utils.data.Dataset):
         try:
             item["task"] = self.meta.tasks[task_idx]
         except:
-            print(self.meta.tasks, task_idx, self.repo_id)
+            pass
         if "robot_type" not in item:
             item["robot_type"] = self.robot_type
         item = map_dict_keys(
@@ -903,9 +909,7 @@ class LeRobotDataset(torch.utils.data.Dataset):
                 if cam in self.meta.camera_keys or ("image" in cam and "is_pad" not in cam):
                     item[cam] = self.image_transforms(item[cam])
         # Map pad keys
-        # print(item.keys(), "before")
         # item = map_dict_pad_keys(item, feature_keys_mapping=self.feature_keys_mapping, training_features=self.training_features)
-        # print(item.keys())
         return item
 
     def __repr__(self):
@@ -1362,10 +1366,7 @@ class MultiLeRobotDataset(torch.utils.data.Dataset):
                 datasets_repo_ids.append(repo_id)
                 self.sampling_weights.append(float(sampling_weights[i]))
             except Exception as e:
-                print(f"Failed to load dataset: {repo_id} due to Exception: {e}")
-        print(
-            f"Finish loading {len(_datasets)} datasets, with sampling weights: {self.sampling_weights} corresponding to: {datasets_repo_ids}"
-        )
+                pass
 
         # Disable any data keys that are not common across all of the datasets. Note: we may relax this
         # restriction in future iterations of this class. For now, this is necessary at least for being able

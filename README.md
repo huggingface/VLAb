@@ -23,20 +23,24 @@ A streamlined library for pretraining VLA models, derived from LeRobot, used to 
 - [Citation](#citation)
 - [File Structure](#file-structure)
 
-> Note on video backends
+Note on video backends
 
 > By default we avoid pinning system FFmpeg in the environment to prevent compatibility issues with TorchCodec on some systems. The training pipeline works with alternative video backends (PyAV, OpenCV, ImageIO). If you specifically need TorchCodec, install FFmpeg in your environment and ensure the FFmpeg libraries match TorchCodec's compatibility table. Otherwise, set `--dataset.video_backend=pyav` (default) or switch to OpenCV/ImageIO in your data loader.
 
-## Features
+## Highlights
 
 It is directly compatible with the https://huggingface.co/datasets/HuggingFaceVLA/community_dataset_v1 and https://huggingface.co/datasets/HuggingFaceVLA/community_dataset_v2 that are used to pretrain smolvla. Note that, while this library can be efficient for pretraining, for finetuning we recommend using lerobot as it is more up-to-date with the inference pipeline and new hardware. 
 
 ## Who is this Library for?
 
 **Pretraining-Focused**: Streamlined codebase designed specifically for VLA pretraining workflows—environment simulation and evaluation dependencies removed to enable cleaner pretraining on real-world data pipelines
+
 **Simple Setup**: Get started immediately with single-command environment creation using conda env create -f environment.yml
+
 **Distributed Training**: Seamless multi-GPU and multi-node support through Accelerate, tested on both single machines and SLURM clusters
+
 **Multi-Dataset Training:** Easily train on multiple datasets with configurable sampling strategies and automatic data loading
+
 **Reduced Dependencies:** Leaner footprint compared to full robotics frameworks in a favor of faster installation and fewer potential conflicts.
 
 > **Note on Fine-tuning & Inference**: Pretrained policies from this codebase may not be directly compatible with the latest LeRobot version. To fine-tune or run inference using LeRobot, you'll need to convert your checkpoint using the [migration script](https://github.com/huggingface/lerobot/blob/f6b16f6d97155e3ce34ab2a1ec145e9413588197/src/lerobot/processor/migrate_policy_normalization.py#L4) to ensure compatibility with updated normalization formats.
@@ -52,7 +56,17 @@ conda activate vlab
 
 **Note:** If your system uses CUDA 12.1, edit `environment.yml` and set `pytorch-cuda=12.1` before creating the environment.
 
-Ensure your Python path includes the `src` directory (e.g., set `PYTHONPATH` to include `src`).
+Set the `PYTHONPATH` environment variable to include the `src` directory:
+
+```bash
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+```
+
+Or add it to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`) for persistence:
+
+```bash
+echo 'export PYTHONPATH="${PWD}/src:${PYTHONPATH}"' >> ~/.bashrc
+```
 
 ### Verify Installation
 
@@ -107,18 +121,41 @@ To train from the Hub without pre-downloading, pass just the repo id.
 
 ### Training with Accelerate
 
-Accelerate works for both single-GPU and multi-GPU setups. First, configure accelerate:
+Accelerate works for both single-GPU and multi-GPU setups. You can use the provided accelerate configs or configure your own:
 
 ```bash
+# Option 1: Use provided configs
+accelerate launch --config_file accelerate_configs/single_gpu.yaml src/lerobot/scripts/train.py ...
+accelerate launch --config_file accelerate_configs/multi_gpu.yaml src/lerobot/scripts/train.py ...
+
+# Option 2: Configure your own
 accelerate config
 ```
 
 Train on datasets from the Hugging Face Hub (automatically downloaded):
 
+**Single GPU:**
 ```bash
-accelerate launch src/lerobot/scripts/train.py \
+accelerate launch --config_file accelerate_configs/single_gpu.yaml \
+    src/lerobot/scripts/train.py \
+    --policy.type=smolvla2 \
+    --policy.repo_id=danaaubakirova/test \
+    --dataset.repo_id="Beegbrain/pick_lemon_and_drop_in_bowl,Chojins/chess_game_000_white_red" \
+    --dataset.video_backend=pyav \
+    --output_dir="./outputs/training" \
+    --batch_size=8 \
+    --steps=200000 \
+    --wandb.enable=true \
+    --wandb.project="smolvla2-training"
+```
+
+**Multi-GPU:**
+```bash
+accelerate launch --config_file accelerate_configs/multi_gpu.yaml \
+    src/lerobot/scripts/train.py \
     --policy.type=smolvla2 \
     --dataset.repo_id="HuggingFaceVLA/community_dataset_v1,HuggingFaceVLA/community_dataset_v2" \
+    --policy.repo_id=danaaubakirova/test \
     --dataset.video_backend=pyav \
     --output_dir="./outputs/training" \
     --batch_size=8 \
@@ -130,8 +167,10 @@ accelerate launch src/lerobot/scripts/train.py \
 To train on local datasets, specify the root directory with `--dataset.root`:
 
 ```bash
-accelerate launch src/lerobot/scripts/train.py \
+accelerate launch --config_file accelerate_configs/multi_gpu.yaml \
+    src/lerobot/scripts/train.py \
     --policy.type=smolvla2 \
+    --policy.repo_id=danaaubakirova/test \
     --dataset.repo_id="user1/dataset_a,user2/dataset_b" \
     --dataset.root="/path/to/local/datasets" \
     --dataset.video_backend=pyav \
@@ -141,6 +180,23 @@ accelerate launch src/lerobot/scripts/train.py \
     --wandb.enable=true \
     --wandb.project="smolvla2-training"
 ```
+```bash
+accelerate launch --config_file accelerate_configs/multi_gpu.yaml \
+    src/lerobot/scripts/train.py \
+    --policy.type=smolvla2 \
+    --policy.repo_id=danaaubakirova/test \
+    --dataset.repo_id="community_dataset_v2/airthebear/so100_GL,community_dataset_v2/acrampette/third_arm_01/" \
+    --dataset.root="/fsx/dana_aubakirova/vla" \
+    --dataset.video_backend=pyav \
+    --output_dir="./outputs/training/new2" \
+    --batch_size=8 \
+    --steps=200000 \
+    --wandb.enable=true \
+    --wandb.project="smolvla2-training" \
+    --dataset.features_version=2
+```
+
+**Note:** When using `--dataset.root`, the `--dataset.repo_id` should contain relative paths from the root directory matching your local directory structure. The dataset files should be located at `{root}/{repo_id}`. For example, if `root="/fsx/dana_aubakirova/vla"` and `repo_id="community_dataset_v1/bensprenger/chess_game_001_blue_stereo"`, the dataset should be at `/fsx/dana_aubakirova/vla/community_dataset_v1/bensprenger/chess_game_001_blue_stereo`.
 
 ### SLURM Cluster Training
 
@@ -151,9 +207,11 @@ Resume training: Use this script to continue training from a checkpoint
 
 Edit the scripts according to your cluster configuration, then submit:
 ```bash
-sbatch scripts/training/train_smolvla_optimized_fresh.slurm
-sbatch scripts/training/train_smolvla_resume.slurm
+sbatch examples/scripts/train_smolvla_optimized_fresh.slurm
+sbatch examples/scripts/train_smolvla_resume.slurm
 ```
+
+For detailed documentation on these scripts, dataset list generation, and configuration options, see the [Examples README](examples/README.md).
 
 ## Additional Resources
 
@@ -202,8 +260,9 @@ VLAb/
 │   │   └── smolvla2/            # SmolVLA2 specific code
 │   ├── scripts/                  # Training scripts
 │   └── utils/                    # Utility functions
-├── scripts/training/             # SLURM training scripts
-├── examples/                     # Example scripts
+├── examples/                      # Example scripts and notebooks
+│   ├── scripts/                   # SLURM training scripts
+│   └── datasets_list.txt          # the list of the pretraining datasets
 ├── .gitignore                    # Git ignore file
 └── README.md                     # This file
 ```
