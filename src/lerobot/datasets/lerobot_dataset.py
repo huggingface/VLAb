@@ -1366,7 +1366,10 @@ class MultiLeRobotDataset(torch.utils.data.Dataset):
                 datasets_repo_ids.append(repo_id)
                 self.sampling_weights.append(float(sampling_weights[i]))
             except Exception as e:
-                pass
+                print(f"Failed to load dataset: {repo_id} due to Exception: {e}")
+        print(
+            f"Finish loading {len(_datasets)} datasets, with sampling weights: {self.sampling_weights} corresponding to: {datasets_repo_ids}"
+        )
 
         # Disable any data keys that are not common across all of the datasets. Note: we may relax this
         # restriction in future iterations of this class. For now, this is necessary at least for being able

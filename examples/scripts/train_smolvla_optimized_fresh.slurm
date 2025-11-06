@@ -100,6 +100,23 @@ export TRANSFORMERS_CACHE="/fsx/dana_aubakirova/vla/.cache/huggingface"
 export HF_HUB_OFFLINE=0
 export TRANSFORMERS_OFFLINE=0
 
+# Optional: Clean HuggingFace cache before training (set to true to enable)
+# This can help resolve issues with corrupted or outdated cached datasets
+CLEAN_CACHE=false
+if [ "$CLEAN_CACHE" = true ]; then
+    echo "🧹 Cleaning HuggingFace cache..."
+    # Clean datasets cache (removes cached dataset files)
+    rm -rf "$HF_HOME/datasets" 2>/dev/null || true
+    # Clean hub cache (removes cached model/dataset downloads)
+    rm -rf "$HF_HUB_CACHE/hub" 2>/dev/null || true
+    # Clean transformers cache (removes cached model files)
+    rm -rf "$TRANSFORMERS_CACHE" 2>/dev/null || true
+    echo "✅ Cache cleaning completed"
+    echo "   Note: Datasets will be re-downloaded on first use"
+else
+    echo "ℹ️  Cache cleaning disabled (set CLEAN_CACHE=true to enable)"
+fi
+
 # Logging configuration - WandB
 export LOGGING_BACKEND="wandb"
 

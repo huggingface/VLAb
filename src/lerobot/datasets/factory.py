@@ -122,15 +122,13 @@ def make_dataset(cfg: TrainPipelineConfig) -> LeRobotDataset | MultiLeRobotDatas
         delta_timestamps = {}
         episodes = {}
         root = getattr(cfg.dataset, "root", None)
-        revision = getattr(cfg.dataset, "revision", None)
         for i in range(len(repo_id)):
-            # For multi-dataset with root, construct the full path as root/repo_id[i]
+            # For multi-dataset with root, each dataset is at root/repo_id[i]
             dataset_root = Path(root) / repo_id[i] if root else None
             ds_meta = LeRobotDatasetMetadata(
                 repo_id[i],
                 root=dataset_root,
                 feature_keys_mapping=feature_keys_mapping,
-                revision=revision,
             )  # FIXME(mshukor): ?
             delta_timestamps[repo_id[i]] = resolve_delta_timestamps(cfg.policy, ds_meta)
             episodes[repo_id[i]] = EPISODES_DATASET_MAPPING.get(repo_id[i], cfg.dataset.episodes)
