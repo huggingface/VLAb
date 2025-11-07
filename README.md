@@ -2,15 +2,11 @@
 
 <img src="VLAb.png" alt="Logo" width="300">
 
-<p align="center" style="display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:10px;">
-  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">🚀 Pretraining-Focused</span>
-  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">🤖 SmolVLA Reproduction</span>
-  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">🧩 Multi-Dataset Integration</span>
-  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">⚡ Multi-GPU &amp; SLURM</span>
-  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">📦 Easy Setup</span>
-</p>
-
 # VLAb: Your Laboratory for Pretraining VLAs 
+
+<p align="center">
+  <img src="https://img.shields.io/badge/🚀%20Pretraining--Focused-38BDF8?style=for-the-badge&logoColor=1E293B&labelColor=1E293B" alt="Pretraining-Focused" /> <img src="https://img.shields.io/badge/🤖%20SmolVLA%20Reproduction-38BDF8?style=for-the-badge&logoColor=1E293B&labelColor=1E293B" alt="SmolVLA Reproduction" /> <img src="https://img.shields.io/badge/🧩%20Multi--Dataset-38BDF8?style=for-the-badge&logoColor=1E293B&labelColor=1E293B" alt="Multi-Dataset Integration" /> <img src="https://img.shields.io/badge/⚡%20Multi--GPU%20%26%20SLURM-38BDF8?style=for-the-badge&logoColor=1E293B&labelColor=1E293B" alt="Multi-GPU & SLURM" /> <img src="https://img.shields.io/badge/📦%20Easy%20Setup-38BDF8?style=for-the-badge&logoColor=1E293B&labelColor=1E293B" alt="Easy Setup" />
+</p>
 
 A streamlined library for pretraining vision-language-action (VLA) models on robotics datasets. Derived from LeRobot, this library focuses specifically on efficient pretraining workflows across multi-GPU setups and SLURM clusters and can be considered as an official reproduction kit for [SmolVLA](https://huggingface.co/blog/smolvla).
 
