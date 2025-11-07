@@ -5,7 +5,7 @@
 # VLAb: Your Laboratory for Pretraining VLAs 
 
 <p align="center">
-  <img src="https://img.shields.io/badge/🚀%20Pretraining--Focused-0EA5E9?style=flat-square&logoColor=ffffff&labelColor=0C4A6E" alt="Pretraining-Focused" /> <img src="https://img.shields.io/badge/🤖%20SmolVLA%20Reproduction-A855F7?style=flat-square&logoColor=ffffff&labelColor=6B21A8" alt="SmolVLA Reproduction" /> <img src="https://img.shields.io/badge/🧩%20Multi--Dataset-10B981?style=flat-square&logoColor=ffffff&labelColor=065F46" alt="Multi-Dataset Support" /> <img src="https://img.shields.io/badge/⚡%20Multi--GPU%20%26%20SLURM-F59E0B?style=flat-square&logoColor=ffffff&labelColor=92400E" alt="Multi-GPU" />
+  <img src="https://img.shields.io/badge/🚀%20Pretraining--Focused-0EA5E9?style=for-the-badge&logoColor=ffffff&labelColor=0C4A6E" alt="Pretraining-Focused" /> <img src="https://img.shields.io/badge/🤖%20SmolVLA%20Reproduction-A855F7?style=for-the-badge&logoColor=ffffff&labelColor=6B21A8" alt="SmolVLA Reproduction" /> <img src="https://img.shields.io/badge/🧩%20Multi--Dataset-10B981?style=for-the-badge&logoColor=ffffff&labelColor=065F46" alt="Multi-Dataset Support" /> <img src="https://img.shields.io/badge/⚡%20Multi--GPU%20%26%20SLURM-F59E0B?style=for-the-badge&logoColor=ffffff&labelColor=92400E" alt="Multi-GPU" />
 </p>
 
 A streamlined library for pretraining vision-language-action (VLA) models on robotics datasets. Derived from LeRobot, this library focuses specifically on efficient pretraining workflows across multi-GPU setups and SLURM clusters and can be considered as an official reproduction kit for [SmolVLA](https://huggingface.co/blog/smolvla).
