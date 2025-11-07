@@ -2,13 +2,19 @@
 
 <img src="VLAb.png" alt="Logo" width="300">
 
+<p align="center" style="display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:10px;">
+  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">🚀 Pretraining-Focused</span>
+  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">🤖 SmolVLA Reproduction</span>
+  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">🧩 Multi-Dataset Integration</span>
+  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">⚡ Multi-GPU &amp; SLURM</span>
+  <span style="background:#1E293B; color:#38BDF8; padding:8px 22px; border-radius:14px; font-weight:600; font-family:Inter, sans-serif; white-space:nowrap;">📦 Easy Setup</span>
+</p>
+
 # VLAb: Your Laboratory for Pretraining VLAs 
 
-A streamlined library for pretraining vision-language-action (VLA) models on robotics datasets. Derived from LeRobot and used to pretrain SmolVLA, this library focuses specifically on efficient pretraining workflows across multi-GPU setups and SLURM clusters and can be considered as an official reproduction kit for [SmolVLA](https://huggingface.co/blog/smolvla).
+A streamlined library for pretraining vision-language-action (VLA) models on robotics datasets. Derived from LeRobot, this library focuses specifically on efficient pretraining workflows across multi-GPU setups and SLURM clusters and can be considered as an official reproduction kit for [SmolVLA](https://huggingface.co/blog/smolvla).
 
 </div>
-
----
 
 ## Overview
 
@@ -91,8 +97,6 @@ Only needed if downloading datasets or models from the Hub:
 huggingface-cli login
 ```
 
----
-
 ## Quick Start
 
 Train SmolVLA2 on 2 datasets with a single GPU:
@@ -117,7 +121,6 @@ This will:
 3. Save checkpoints to `./outputs/training`
 4. Log metrics to Weights & Biases
 
----
 
 ## Reproducing SmolVLA Training
 
@@ -146,14 +149,18 @@ community_dataset_v1/              community_dataset_v2/
 
 ### Downloading Datasets
 
+Note that it may take some time (3/4 hours), especially for the first dataset
+
 ```bash
 # Download Community Dataset v1 (128 datasets, 11.1K episodes, 119.3 GB)
-huggingface-cli download HuggingFaceVLA/community_dataset_v1 \
-    --local-dir /path/to/datasets/community_dataset_v1
+hf download HuggingFaceVLA/community_dataset_v1 \
+       --repo-type=dataset \
+       --local-dir /path/local_dir/community_dataset_v1
 
 # Download Community Dataset v2 (340 datasets, 6.3K episodes, 59 GB)
-huggingface-cli download HuggingFaceVLA/community_dataset_v2 \
-    --local-dir /path/to/datasets/community_dataset_v2
+hf download HuggingFaceVLA/community_dataset_v2 \
+       --repo-type=dataset \
+       --local-dir /path/local_dir/community_dataset_v2
 ```
 
 ### Local Training with Accelerate
@@ -213,8 +220,6 @@ sbatch examples/scripts/train_smolvla_optimized_fresh.slurm
 
 For detailed documentation on SLURM scripts, dataset configuration, and advanced options, see the [Examples README](examples/README.md).
 
----
-
 ## Video Backend Configuration
 
 VLAb supports multiple video backends for maximum compatibility:
@@ -226,8 +231,6 @@ VLAb supports multiple video backends for maximum compatibility:
 
 We avoid pinning FFmpeg to prevent compatibility issues. If you need TorchCodec, install FFmpeg separately and ensure version compatibility.
 
----
-
 ## Migration to LeRobot
 
 Checkpoints from VLAb may not be directly compatible with the latest LeRobot version due to updated normalization formats. To use your pretrained models with LeRobot:
@@ -235,8 +238,6 @@ Checkpoints from VLAb may not be directly compatible with the latest LeRobot ver
 1. **Convert Checkpoint**: Use the [migration script](https://github.com/huggingface/lerobot/blob/f6b16f6d97155e3ce34ab2a1ec145e9413588197/src/lerobot/processor/migrate_policy_normalization.py#L4) from LeRobot
 2. **Fine-tune**: Follow the [LeRobot fine-tuning guide](https://huggingface.co/docs/lerobot/smolvla)
 3. **Inference**: Use LeRobot's updated inference pipeline
-
----
 
 ## Troubleshooting
 
@@ -259,8 +260,6 @@ In SLURM scripts, set `CLEAN_CACHE=true` to automatically clean cache before tra
 
 For additional help, open an issue on [GitHub](https://github.com/huggingface/vlab/issues).
 
----
-
 ## Additional Resources
 
 - **[LeRobot GitHub](https://github.com/huggingface/lerobot)**: Main LeRobot repository for fine-tuning and inference
@@ -268,8 +267,6 @@ For additional help, open an issue on [GitHub](https://github.com/huggingface/vl
 - **[LeRobot Installation](https://huggingface.co/docs/lerobot/en/installation)**: Detailed installation instructions
 - **[Accelerate Documentation](https://huggingface.co/docs/accelerate)**: Distributed training configuration
 - **[Examples README](examples/README.md)**: Detailed documentation for SLURM scripts and advanced usage
-
----
 
 ## Citation
 
@@ -300,8 +297,6 @@ And the SmolVLA paper:
 }
 ```
 
----
-
 ## Project Structure
 
 ```
@@ -324,4 +319,3 @@ VLAb/
 └── README.md                     # This file
 ```
 
----

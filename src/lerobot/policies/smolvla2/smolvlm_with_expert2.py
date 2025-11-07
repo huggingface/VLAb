@@ -77,10 +77,19 @@ class SmolVLMWithExpertModel(nn.Module):
         if load_vlm_weights:
             print(f"Loading  {model_id} weights ...")
             # Disable device_map when using Accelerate for multi-GPU training
+            # Check for accelerate launch (same check as train.py)
             import os
-            use_accelerate = os.environ.get('ACCELERATE_USE_FSDP', 'false').lower() != 'true' and \
-                           'ACCELERATE_CONFIG_FILE' in os.environ
-            device_map = None if use_accelerate else "auto"
+            is_accelerate = "ACCELERATE_MIXED_PRECISION" in os.environ
+            # Also check if we're in a distributed environment
+            try:
+                import torch.distributed as dist
+                is_distributed = dist.is_initialized()
+            except:
+                is_distributed = False
+            # Use device_map=None when using accelerate or distributed training
+            # This prevents tensor parallel which requires torch>=2.5
+            use_device_map = not (is_accelerate or is_distributed)
+            device_map = None if not use_device_map else "auto"
             self.vlm = AutoModelForImageTextToText.from_pretrained(
                 model_id,
                 device_map=device_map,

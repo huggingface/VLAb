@@ -3,9 +3,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=88
-#SBATCH --gres=gpu:8
+#SBATCH --gres=gpu:2
 #SBATCH --mem=0
-#SBATCH --time=48:00:00
+#SBATCH --time=72:00:00
 #SBATCH --partition=hopper-prod
 #SBATCH --output=/fsx/dana_aubakirova/vla/logs/smolvla_fresh_%j.out
 #SBATCH --error=/fsx/dana_aubakirova/vla/logs/smolvla_fresh_%j.err
@@ -22,7 +22,7 @@ conda activate vlab
 export PYTHONPATH="/fsx/dana_aubakirova/vla/VLAb/src:$PYTHONPATH"
 
 # CUDA environment configuration
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=0,1
 export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True,garbage_collection_threshold:0.8
 export TORCH_DISTRIBUTED_DEBUG=OFF
 export NCCL_DEBUG=WARN
@@ -40,7 +40,7 @@ cd /fsx/dana_aubakirova/vla
 # FRESH START training configuration - NEW OUTPUT DIRECTORY
 export OUTPUT_DIR="/fsx/dana_aubakirova/vla/outputs/train_smolvla_fresh_$(date +%Y%m%d_%H%M%S)"
 # Use ALL datasets from all_datasets_relative.txt - full scale training
-export REPO_IDS=$(cat /fsx/dana_aubakirova/vla/all_datasets_relative.txt)
+export REPO_IDS=$(cat /fsx/dana_aubakirova/vla/VLAb/examples/all_datasets_relative.txt)
 # For testing with a small subset, use:
 #export REPO_IDS="AndrejOrsula/lerobot_double_ball_stacking_random,koenvanwijk/orange50-variation-2"
 
@@ -94,8 +94,8 @@ export WARMUP_STEPS=1000
 
 # Set environment variables for model cache and offline mode
 export HF_LEROBOT_HOME="/fsx/dana_aubakirova/vla"
-export HF_HOME="/fsx/dana_aubakirova/vla/.cache/huggingface"
-export HF_HUB_CACHE="/fsx/dana_aubakirova/vla/.cache/huggingface"
+#export HF_HOME="/fsx/dana_aubakirova/vla/.cache/huggingface"
+#export HF_HUB_CACHE="/fsx/dana_aubakirova/vla/.cache/huggingface"
 export TRANSFORMERS_CACHE="/fsx/dana_aubakirova/vla/.cache/huggingface"
 export HF_HUB_OFFLINE=0
 export TRANSFORMERS_OFFLINE=0
@@ -134,7 +134,7 @@ echo "📊 Datasets: ALL datasets from all_datasets_relative.txt"
 echo "📁 Output directory: $OUTPUT_DIR"
 echo "📊 Number of datasets: $(echo "$REPO_IDS" | tr ',' '\n' | wc -l)"
 echo "🎯 Policy: $POLICY"
-echo "🔧 Batch size per GPU: $BATCH_SIZE (GLOBAL: $((BATCH_SIZE * 8)))"
+echo "🔧 Batch size per GPU: $BATCH_SIZE (GLOBAL: $((BATCH_SIZE * 2)))"
 echo "🔄 Gradient accumulation steps: $GRADIENT_ACCUMULATION_STEPS"
 echo "📈 Training steps: $STEPS"
 echo "💾 Save frequency: $SAVE_FREQ"
@@ -148,7 +148,7 @@ echo "🖼️  Image dimension: $MAX_IMAGE_DIM"
 echo "👥 Data workers: $NUM_WORKERS"
 echo "🧠 VLM layers: $VLM_LAYERS"
 echo "🎯 LORA rank: $LORA_R"
-echo "🖥️  GPUs: 8"
+echo "🖥️  GPUs: 2"
 echo "📊 Wandb project: $WANDB_PROJECT"
 echo "🚀 =============================================="
 
@@ -210,7 +210,7 @@ echo "   • Training from step 0 to step $STEPS"
 echo "   • WandB logging enabled for experiment tracking"
 echo ""
 echo "🚀 Key optimizations:"
-echo "   • 8 GPUs with global batch size $((BATCH_SIZE * 8))"
+echo "   • 2 GPUs with global batch size $((BATCH_SIZE * 2))"
 echo "   • Memory-optimized data loading: $NUM_WORKERS workers"
 echo "   • Stable training without mixed precision"
 echo "   • Optimized NCCL settings for multi-GPU communication"
